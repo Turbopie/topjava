@@ -1,0 +1,9 @@
+TABLE {
+    width: 600px;
+    border-collapse: collapse; /* Убираем двойные границы между ячейками */
+    border: 4px solid grey; /* Рамка вокруг таблицы */
+    margin: auto;
+}
+TD, TH {
+    border: 2px solid grey; /* Рамка вокруг ячеек */
+}
