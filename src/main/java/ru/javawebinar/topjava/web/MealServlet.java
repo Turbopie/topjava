@@ -22,7 +22,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
-    private MealRepository mealRepository;
+    private MealRepository mealRepository = new MealRepository();
     private final static String INSERT_OR_EDIT = "/mealEdit.jsp";
     private final static String LIST_MEAL = "/meals.jsp";
 
@@ -33,7 +33,12 @@ public class MealServlet extends HttpServlet {
         String forward;
         String action = request.getParameter("action");
 
-        if (action.equalsIgnoreCase("delete")) {
+
+        if(action == null) {
+            log.debug("redirect to meals");
+            forward = LIST_MEAL;
+            request.setAttribute("meals", mealRepository.getAllMeals());
+        } else if (action.equalsIgnoreCase("delete")) {
             log.debug("redirect to meals delete");
             int mealId = Integer.parseInt(request.getParameter("mealId"));
             mealRepository.delete(mealId);
@@ -42,13 +47,13 @@ public class MealServlet extends HttpServlet {
         } else if (action.equalsIgnoreCase("edit")) {
             log.debug("redirect to meals insert or edit");
             forward = INSERT_OR_EDIT;
-            int mealId = Integer.parseInt(request.getParameter("mealId"));
-            Meal meal = mealRepository.getMealById(mealId);
-            request.setAttribute("meal", meal);
-        } else if (action.equalsIgnoreCase("")) {
-            log.debug("redirect to meals");
-            forward = LIST_MEAL;
-            request.setAttribute("meals", mealRepository.getAllMeals());
+            if(request.getParameter("mealId") == null) {
+                request.setAttribute("meal", new Meal(null,null,0));
+            } else {
+                int mealId = Integer.parseInt(request.getParameter("mealId"));
+                Meal meal = mealRepository.getMealById(mealId);
+                request.setAttribute("meal", meal);
+            }
         } else {
             log.debug("redirect to meals insert or edit");
             forward = INSERT_OR_EDIT;
@@ -62,28 +67,30 @@ public class MealServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
 
         String description = req.getParameter("description");
         int calories = Integer.parseInt(req.getParameter("calories"));
 
-        String dateTimeStr = req.getParameter("dateTime");
+        String dateTimeStr = req.getParameter("dateTime").replace("T"," ");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         LocalDateTime dateTime = LocalDateTime.parse(dateTimeStr, formatter);
 
         Meal meal = new Meal(dateTime,description,calories);
 
         String mealIdStr = req.getParameter("mealId");
+
         if(mealIdStr == null || mealIdStr.isEmpty())
         {
             log.debug("redirect to meals save");
-            mealRepository.save(meal);
         }
         else
         {
             log.debug("redirect to meals update");
             meal.setId(Integer.parseInt(mealIdStr));
-            mealRepository.update(meal);
         }
+
+        mealRepository.save(meal);
 
         RequestDispatcher view = req.getRequestDispatcher(LIST_MEAL);
         req.setAttribute("meals", mealRepository.getAllMeals());
