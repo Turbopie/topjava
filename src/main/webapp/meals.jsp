@@ -23,6 +23,31 @@
     <h2>Meals</h2>
     <a href="meals?action=create">Add Meal</a>
     <br><br>
+
+
+    <form id="filter">
+        <div>
+            <div>
+                <label for="startDate">От даты (включая)</label>
+                <input type="date" name="startDate" id="startDate" autocomplete="off" >
+            </div>
+            <div>
+                <label for="endDate">До даты (включая)</label>
+                <input type="date" name="endDate" id="endDate" autocomplete="off">
+            </div>
+            <div>
+                <label for="startTime">От времени (включая)</label>
+                <input type="time" name="startTime" id="startTime" autocomplete="off">
+            </div>
+            <div>
+                <label for="endTime">До времени (исключая)</label>
+                <input type="time" name="endTime" id="endTime" autocomplete="off">
+            </div>
+        </div>
+        <button type="submit">Save</button>
+    </form>
+
+
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
         <tr>
